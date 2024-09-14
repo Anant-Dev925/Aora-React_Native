@@ -44,7 +44,7 @@ const VideoCard = ({ video: { title, thumbnail, video, creator: { username, avat
             shouldPlay
             onPlaybackStatusUpdate={(status) => {
               if (status.didJustFinish) {
-                setPlay(false);
+                setplay(false);
               }
             }}
             onError={(error) => console.log("Video playback error:", error)}
