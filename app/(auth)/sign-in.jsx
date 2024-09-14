@@ -1,41 +1,44 @@
-import { View, Text, ScrollView, Image, Alert } from 'react-native'
-import React from 'react'
-import { SafeAreaView } from 'react-native-safe-area-context'
-import { images } from '../../constants'
-import FormField from '../../components/FormField'
-import { useState } from 'react'
-import CustomButton from '../../components/CustomButton'
-import { Link, router } from 'expo-router'
-import { signIn } from '../../lib/appwrite'
+import { View, Text, ScrollView, Image, Alert } from "react-native";
+import React from "react";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { images } from "../../constants";
+import FormField from "../../components/FormField";
+import { useState } from "react";
+import CustomButton from "../../components/CustomButton";
+import { Link, router } from "expo-router";
+import { signIn, getCurrentUser } from "../../lib/appwrite";
 import { useGlobalContext } from "../../context/GlobalProvider";
 
 const SignIn = () => {
-
   const { setUser, setIsLoggedIn } = useGlobalContext();
   const [form, setform] = useState({
-    email:'',
-    password:''
-  })
+    email: "",
+    password: "",
+  });
 
-  const [isSubmitting, setisSubmitting] = useState(false)
+  const [isSubmitting, setisSubmitting] = useState(false);
 
- const submit = async () => {
+  const submit = async () => {
     if (form.email === "" || form.password === "") {
-      Alert.alert("Error", "Please fill in all fields")
-      }
-     setisSubmitting(true);
+      Alert.alert("Error", "Please fill in all fields");
+      return;
+    }
+    setisSubmitting(true);
     try {
       await signIn(form.email, form.password);
+      const result = await getCurrentUser();
       setUser(result);
-      setIsLoggedIn(true);
+      setIsLoggedIn(false);
 
-      router.replace('/home');
+      Alert.alert("Success", "User signed in successfully");
+      router.replace("/home");
     } catch (error) {
-      Alert.alert("Error:", error.message);
+      console.error("Sign-in function error:", error); // Log error in the sign-in function
+      throw error; // Throw the error to be caught by the outer catch block
     } finally {
       setisSubmitting(false);
     }
-}
+  };
 
   return (
     <SafeAreaView className="bg-primary h-full">
@@ -43,10 +46,12 @@ const SignIn = () => {
         <View className="w-full justify-center min-h-[74vh] px-4 my-6">
           <Image
             source={images.logo}
-            resizeMode='contain'
+            resizeMode="contain"
             className="w-[115px] h-[35px]"
           />
-          <Text className="text-white text-2xl text-semibold mt-10 font-psemibold">Log In to Aora</Text>
+          <Text className="text-white text-2xl text-semibold mt-10 font-psemibold">
+            Log In to Aora
+          </Text>
 
           <FormField
             title="Email"
@@ -84,7 +89,7 @@ const SignIn = () => {
         </View>
       </ScrollView>
     </SafeAreaView>
-  )
-}
+  );
+};
 
-export default SignIn
+export default SignIn;
