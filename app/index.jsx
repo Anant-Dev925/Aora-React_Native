@@ -11,14 +11,13 @@ export default function App() {
   const { isLoading, isLoggedIn } = useGlobalContext();
   
   if(!isLoading && isLoggedIn) return <Redirect href='/home' />
-
   return (
     <SafeAreaView className="bg-primary h-full">
       <ScrollView contentContainerStyle={{height: '100%'}}>
-        <View className="w-full flex justify-center items-center min-h-[84vh] px-4">
+        <View className="w-full flex justify-center items-center min-h-[86vh] px-4">
           <Image
             source={images.logo}
-            className="w-[130px] h-[84px]"
+            className="w-[200px] h-[84px]"
             resizeMode="contain"
           />
           <Image
@@ -31,7 +30,7 @@ export default function App() {
             <Text className="text-3xl text-white font-bold text-center">
               Discover Endless{"\n"}
               Possibilities with{" "}
-              <Text className="text-secondary-200">Aora</Text>
+              <Text className="text-secondary-200">Astra</Text>
             </Text>
 
             <Image

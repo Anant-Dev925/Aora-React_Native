@@ -1,10 +1,13 @@
-import { View, Text, Image, TouchableOpacity } from 'react-native'
+import { View, Text, Image, TouchableOpacity, Alert } from 'react-native'
 import React, {useState} from 'react'
 import { icons } from '../constants'
 import { ResizeMode, Video } from 'expo-av'
+import { likeVideo, getVideoDownloadUrl } from '../lib/appwrite'
+import * as Clipboard from 'expo-clipboard'
 
-const VideoCard = ({ video: { title, thumbnail, video, creator: { username, avatar } } }) => {
-    const [play, setplay] = useState(false)
+
+const VideoCard = ({ video: { $id, title, thumbnail, video, creator: { username, avatar } } }) => {
+  const [play, setplay] = useState(false)
 
   return (
     <View className="flex-col items-center px-4 mb-14">
@@ -37,7 +40,7 @@ const VideoCard = ({ video: { title, thumbnail, video, creator: { username, avat
         (console.log(video),
         (
           <Video
-            source={{ uri:video }}
+            source={{ uri: video }}
             className="w-full h-60 rounded-xl mt-3"
             resizeMode={ResizeMode.CONTAIN}
             useNativeControls
