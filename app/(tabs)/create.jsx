@@ -80,7 +80,7 @@ const Create = () => {
   return (
     <SafeAreaView className="bg-primary h-full">
       <ScrollView className="px-4 my-6">
-        <Text className="text-white text-2xl text-center font-psemibold">
+        <Text className="text-white text-2xl font-psemibold">
           Upload Video
         </Text>
 

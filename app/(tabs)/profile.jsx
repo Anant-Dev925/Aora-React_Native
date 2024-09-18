@@ -1,34 +1,57 @@
-import { View, FlatList, TouchableOpacity, Image } from "react-native";
+import { View, FlatList, TouchableOpacity, Image, Alert } from "react-native";
 import React from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
 import EmptyState from "../../components/EmptyState";
-import { getUserPosts, signOut } from "../../lib/appwrite";
+import { getUserPosts, signOut, saveVideo, deleteVideoPost } from "../../lib/appwrite";
 import useAppwrite from "../../lib/useAppwrite";
 import VideoCard from "../../components/VideoCard";
-import {useGlobalContext} from '../../context/GlobalProvider'
+import { useGlobalContext } from "../../context/GlobalProvider";
 import { icons } from "../../constants";
 import InfoBox from "../../components/InfoBox";
 import { router } from "expo-router";
 
 const Profile = () => {
   const { user, setUser, setIsLoggedIn } = useGlobalContext();
-  const { data: posts } = useAppwrite(() => getUserPosts(user.$id)); 
- 
-   const logout = async () => {
-     await signOut();
-     setUser(null);
-     setIsLoggedIn(false);
+  const { data: posts, refetch } = useAppwrite(() => getUserPosts(user.$id));
 
-     router.replace("/sign-in");
-   };
+  const logout = async () => {
+    await signOut();
+    setUser(null);
+    setIsLoggedIn(false);
+    router.replace("/sign-in");
+  };
+
+  const menuItems = (videoId) => [
+    {
+      label: "Delete",
+      action: () => handleDeletePost(videoId),
+      icon: icons.delete,
+    },
+  ];
+
+ 
+
+ const handleDeletePost = async (videoId) => {
+   try {
+     await deleteVideoPost(videoId);
+     Alert.alert("Success", "Video post deleted successfully");
+     await refetch();
+   } catch (error) {
+     Alert.alert("Error", "Failed to delete the video post");
+     console.error(error);
+   }
+ };
+
   return (
     <SafeAreaView className="bg-primary h-full">
       <FlatList
         className="pb-10"
         data={posts}
         keyExtractor={(item) => item.$id}
-        renderItem={({ item }) => <VideoCard video={item} />}
+        renderItem={({ item }) => (
+          <VideoCard video={{ ...item, menuItems: menuItems(item.$id) }} />
+        )}
         ListHeaderComponent={() => (
           <View className="w-full justify-center items-center mt-6 mb-12 px-4">
             <TouchableOpacity
@@ -72,7 +95,7 @@ const Profile = () => {
         ListEmptyComponent={() => (
           <EmptyState
             title="No Videos Found"
-            subtitle="No videos found for this search query"
+            subtitle="Start Creating Videos to see here"
           />
         )}
       />

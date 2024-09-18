@@ -8,16 +8,17 @@ import {
 } from "react-native";
 import React, { useEffect } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { images } from "../../constants";
+import { icons, images } from "../../constants";
 import SearchInput from "../../components/SearchInput";
 import { StatusBar } from "expo-status-bar";
 import Trending from "../../components/Trending";
 import EmptyState from "../../components/EmptyState";
 import { useState } from "react";
-import { getAllPosts, getLatestPosts } from "../../lib/appwrite";
+import { deleteSavedVideo, getAllPosts, getLatestPosts } from "../../lib/appwrite";
 import useAppwrite from "../../lib/useAppwrite";
 import VideoCard from "../../components/VideoCard";
 import { useGlobalContext } from "../../context/GlobalProvider";
+import { saveVideo } from "../../lib/appwrite";
 
 const Home = () => {
   
@@ -32,7 +33,36 @@ const Home = () => {
     await refetch();
     setrefreshing(false);
   };
+
+  const handleSave = (videoId) => {
+    saveVideo(user.$id, videoId)
+      .then(() => {
+        Alert.alert("Success", "Video saved successfully");
+      })
+      .catch((error) => {
+        Alert.alert("Error", "Failed to save the video");
+        console.error(error);
+      });
+  };
+
+  const handleDelete = (videoId) => {
+    deleteSavedVideo(user.$id, videoId)
+      .then(() => {
+      Alert.alert("Success", "Video deleted successfully")
+      })
+      .catch((error) => {
+        Alert.alert("Error", "Failed to delete the video");
+        console.log(error);
+    })
+  }
  
+const menuItems = (videoId) => [
+  {
+    label: "Save",
+    action: () => handleSave(videoId),
+    icon: icons.bookmark,
+  },
+];
 
   return (
     <SafeAreaView className="bg-primary h-full">
@@ -41,7 +71,7 @@ const Home = () => {
         data={posts}
         keyExtractor={(item) => item.$id}
         renderItem={({ item }) => (
-          <VideoCard video={item} />
+          <VideoCard video={{ ...item, menuItems: menuItems(item.$id) }} />
         )}
         ListHeaderComponent={() => (
           <View className="my-6 px-4 space-y-6">
